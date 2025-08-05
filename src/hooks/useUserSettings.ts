@@ -30,7 +30,7 @@ export function useUserSettings() {
   const performDatabaseUpdate = useCallback(
     async (updates: UserSettingsUpdate) => {
       if (!user || !supabase || !settings) {
-        console.log("❌ Cannot perform database update: missing requirements");
+        // console.log("❌ Cannot perform database update: missing requirements");
         return;
       }
 
@@ -42,11 +42,11 @@ export function useUserSettings() {
 
         // Rate limiting
         if (timeSinceLastUpdate < MIN_UPDATE_INTERVAL) {
-          console.log(
-            "⏳ Rate limiting update, will retry in:",
-            MIN_UPDATE_INTERVAL - timeSinceLastUpdate,
-            "ms"
-          );
+          // console.log(
+          //   "⏳ Rate limiting update, will retry in:",
+          //   MIN_UPDATE_INTERVAL - timeSinceLastUpdate,
+          //   "ms"
+          // );
           setTimeout(
             () => performDatabaseUpdate(updates),
             MIN_UPDATE_INTERVAL - timeSinceLastUpdate
@@ -54,7 +54,7 @@ export function useUserSettings() {
           return;
         }
 
-        console.log("📡 Updating settings in database:", updates);
+        // console.log("📡 Updating settings in database:", updates);
         const { data, error: updateError } = await supabase
           .from("user_settings")
           .update({
@@ -70,7 +70,7 @@ export function useUserSettings() {
           throw updateError;
         }
 
-        console.log("✅ Settings saved to database successfully");
+        // console.log("✅ Settings saved to database successfully");
         setSettings(data);
         lastUpdateRef.current = now;
       } catch (err) {
@@ -92,7 +92,7 @@ export function useUserSettings() {
     saveTimeoutRef.current = window.setTimeout(() => {
       setPendingUpdates((current) => {
         if (Object.keys(current).length > 0) {
-          console.log("🚀 Debounced save triggered:", current);
+          // console.log("🚀 Debounced save triggered:", current);
           performDatabaseUpdate(current);
           return {};
         }
@@ -105,7 +105,7 @@ export function useUserSettings() {
   const updateSettings = useCallback(
     (updates: UserSettingsUpdate) => {
       if (!user || !settings) {
-        console.log("❌ Cannot update settings: no user or settings loaded");
+        // console.log("❌ Cannot update settings: no user or settings loaded");
         return;
       }
 
@@ -115,10 +115,10 @@ export function useUserSettings() {
       // Accumulate pending updates for batched save
       setPendingUpdates((prev) => ({ ...prev, ...updates }));
 
-      console.log(
-        "🔄 Settings updated locally, will save after debounce:",
-        updates
-      );
+      // console.log(
+      //   "🔄 Settings updated locally, will save after debounce:",
+      //   updates
+      // );
 
       // Trigger debounced save
       debouncedSave();
@@ -135,7 +135,7 @@ export function useUserSettings() {
 
     setPendingUpdates((current) => {
       if (Object.keys(current).length > 0) {
-        console.log("🚀 Force saving pending updates:", current);
+        // console.log("🚀 Force saving pending updates:", current);
         performDatabaseUpdate(current);
         return {};
       }
@@ -146,7 +146,7 @@ export function useUserSettings() {
   // Theme update functions
   const updateTheme = useCallback(
     (theme_mode: ThemeMode) => {
-      console.log("🎨 Updating theme:", theme_mode);
+      // console.log("🎨 Updating theme:", theme_mode);
       updateSettings({ theme_mode });
     },
     [updateSettings]
@@ -154,7 +154,7 @@ export function useUserSettings() {
 
   const updateStarsEnabled = useCallback(
     (stars_enabled: boolean) => {
-      console.log("⭐ Updating stars enabled:", stars_enabled);
+      // console.log("⭐ Updating stars enabled:", stars_enabled);
       updateSettings({ stars_enabled });
     },
     [updateSettings]
@@ -162,7 +162,7 @@ export function useUserSettings() {
 
   const updateClockEnabled = useCallback(
     (clock_enabled: boolean) => {
-      console.log("🕐 Updating clock enabled:", clock_enabled);
+      // console.log("🕐 Updating clock enabled:", clock_enabled);
       updateSettings({ clock_enabled });
     },
     [updateSettings]
@@ -171,24 +171,24 @@ export function useUserSettings() {
   // MAIN EFFECT: Handle auth state and initialize settings
   useEffect(() => {
     const handleAuthStateChange = async () => {
-      console.log("🔄 Auth state evaluation:", {
-        authLoading,
-        hasUser: !!user,
-        userId: user?.id,
-        currentUserId: currentUserIdRef.current,
-        hasInitialized: hasInitializedRef.current,
-      });
+      // console.log("🔄 Auth state evaluation:", {
+      //   authLoading,
+      //   hasUser: !!user,
+      //   userId: user?.id,
+      //   currentUserId: currentUserIdRef.current,
+      //   hasInitialized: hasInitializedRef.current,
+      // });
 
       // Step 1: Wait for auth to complete
       if (authLoading) {
-        console.log("⏳ Auth still loading, waiting...");
+        // console.log("⏳ Auth still loading, waiting...");
         setLoading(true);
         return;
       }
 
       // Step 2: Handle no user (logged out)
       if (!user) {
-        console.log("👤 No user found, clearing settings");
+        // console.log("👤 No user found, clearing settings");
         if (hasInitializedRef.current) {
           // Save any pending updates before clearing
           if (saveTimeoutRef.current) {
@@ -198,10 +198,10 @@ export function useUserSettings() {
 
           setPendingUpdates((current) => {
             if (Object.keys(current).length > 0) {
-              console.log(
-                "🚀 Force saving pending updates before logout:",
-                current
-              );
+              // console.log(
+              //   "🚀 Force saving pending updates before logout:",
+              //   current
+              // );
               performDatabaseUpdate(current);
             }
             return {};
@@ -209,7 +209,7 @@ export function useUserSettings() {
         }
 
         // Clear settings inline
-        console.log("🧹 Clearing user settings");
+        // console.log("🧹 Clearing user settings");
         setSettings(null);
         setError(null);
         setLoading(false);
@@ -225,9 +225,9 @@ export function useUserSettings() {
 
       // Step 3: Check if user has changed
       if (currentUserIdRef.current && currentUserIdRef.current !== user.id) {
-        console.log(
-          "🔄 User changed, saving previous user's updates and clearing"
-        );
+        // console.log(
+        //   "🔄 User changed, saving previous user's updates and clearing"
+        // );
 
         // Save immediately inline
         if (saveTimeoutRef.current) {
@@ -237,17 +237,17 @@ export function useUserSettings() {
 
         setPendingUpdates((current) => {
           if (Object.keys(current).length > 0) {
-            console.log(
-              "🚀 Force saving pending updates for user change:",
-              current
-            );
+            // console.log(
+            //   "🚀 Force saving pending updates for user change:",
+            //   current
+            // );
             performDatabaseUpdate(current);
           }
           return {};
         });
 
         // Clear settings inline
-        console.log("🧹 Clearing user settings for user change");
+        // console.log("🧹 Clearing user settings for user change");
         setSettings(null);
         setError(null);
         setLoading(false);
@@ -262,7 +262,7 @@ export function useUserSettings() {
 
       // Step 4: Initialize settings for current user (only once)
       if (!hasInitializedRef.current || currentUserIdRef.current !== user.id) {
-        console.log("🚀 Initializing settings for user:", user.id);
+        // console.log("🚀 Initializing settings for user:", user.id);
         hasInitializedRef.current = true;
 
         // Initialize settings inline
@@ -275,7 +275,7 @@ export function useUserSettings() {
             throw new Error("Supabase not available");
           }
 
-          console.log("📡 Fetching settings from database for user:", user.id);
+          // console.log("📡 Fetching settings from database for user:", user.id);
           const { data, error: fetchError } = await supabase
             .from("user_settings")
             .select("*")
@@ -286,10 +286,10 @@ export function useUserSettings() {
           if (fetchError) {
             // If no settings exist, create default settings
             if (fetchError.code === "PGRST116") {
-              console.log("📝 No settings found, creating defaults");
+              // console.log("📝 No settings found, creating defaults");
 
               // Create defaults inline
-              console.log("📝 Creating default settings for user:", user.id);
+              // console.log("📝 Creating default settings for user:", user.id);
               const { data: defaultData, error: insertError } = await supabase
                 .from("user_settings")
                 .insert({
@@ -302,22 +302,22 @@ export function useUserSettings() {
                 .single();
 
               if (insertError) throw insertError;
-              console.log(
-                "✅ Default settings created successfully:",
-                defaultData
-              );
+              // console.log(
+              //   "✅ Default settings created successfully:",
+              //   defaultData
+              // );
               userSettings = defaultData;
             } else {
               throw fetchError;
             }
           } else {
-            console.log("✅ Settings loaded successfully:", data);
+            // console.log("✅ Settings loaded successfully:", data);
             userSettings = data;
           }
 
           setSettings(userSettings);
           currentUserIdRef.current = user.id;
-          console.log("🎉 User settings initialized for user:", user.id);
+          // console.log("🎉 User settings initialized for user:", user.id);
         } catch (err) {
           console.error("❌ Error initializing user settings:", err);
           setError(
@@ -328,7 +328,7 @@ export function useUserSettings() {
           setLoading(false);
         }
       } else {
-        console.log("✅ Settings already initialized for this user");
+        // console.log("✅ Settings already initialized for this user");
         setLoading(false);
       }
     };
@@ -346,7 +346,7 @@ export function useUserSettings() {
       // Save any pending updates
       setPendingUpdates((current) => {
         if (Object.keys(current).length > 0) {
-          console.log("🧹 Component unmounting, saving pending updates");
+          // console.log("🧹 Component unmounting, saving pending updates");
           performDatabaseUpdate(current);
         }
         return {};
@@ -388,7 +388,7 @@ export function useUserSettings() {
             throw new Error("Supabase not available");
           }
 
-          console.log("📡 Fetching settings from database for user:", user.id);
+          // console.log("📡 Fetching settings from database for user:", user.id);
           const { data, error: fetchError } = await supabase
             .from("user_settings")
             .select("*")
@@ -399,10 +399,10 @@ export function useUserSettings() {
           if (fetchError) {
             // If no settings exist, create default settings
             if (fetchError.code === "PGRST116") {
-              console.log("📝 No settings found, creating defaults");
+              // console.log("📝 No settings found, creating defaults");
 
               // Create defaults inline
-              console.log("📝 Creating default settings for user:", user.id);
+              // console.log("📝 Creating default settings for user:", user.id);
               const { data: defaultData, error: insertError } = await supabase
                 .from("user_settings")
                 .insert({
@@ -415,22 +415,22 @@ export function useUserSettings() {
                 .single();
 
               if (insertError) throw insertError;
-              console.log(
-                "✅ Default settings created successfully:",
-                defaultData
-              );
+              // console.log(
+              //   "✅ Default settings created successfully:",
+              //   defaultData
+              // );
               userSettings = defaultData;
             } else {
               throw fetchError;
             }
           } else {
-            console.log("✅ Settings loaded successfully:", data);
+            // console.log("✅ Settings loaded successfully:", data);
             userSettings = data;
           }
 
           setSettings(userSettings);
           currentUserIdRef.current = user.id;
-          console.log("🎉 User settings initialized for user:", user.id);
+          // console.log("🎉 User settings initialized for user:", user.id);
         } catch (err) {
           console.error("❌ Error initializing user settings:", err);
           setError(

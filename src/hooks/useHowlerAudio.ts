@@ -42,19 +42,19 @@ export function useHowlerAudio({
 
           // Ensure audioFile is defined before proceeding
           if (!audioFile) {
-            console.warn(
-              `⚠️ No audio file for sound: ${sound.name || "unknown"}`
-            );
+            // console.warn(
+            //   `⚠️ No audio file for sound: ${sound.name || "unknown"}`
+            // );
             return;
           }
 
           // Debug logging
-          console.log(`🎵 Processing sound for ${slotKey}:`, {
-            soundName: sound.name,
-            soundId: sound.id,
-            audioFile: audioFile,
-            isCustom: sound.isCustom,
-          });
+          // console.log(`🎵 Processing sound for ${slotKey}:`, {
+          //   soundName: sound.name,
+          //   soundId: sound.id,
+          //   audioFile: audioFile,
+          //   isCustom: sound.isCustom,
+          // });
 
           // Only create new Howl if sound source changed
           if (!existingHowl || existingSource !== audioFile) {
@@ -66,25 +66,25 @@ export function useHowlerAudio({
             }
 
             // Create new Howl instance
-            console.log(
-              `🎵 Creating new Howl instance for ${slotKey} with src: ${audioFile}`
-            );
+            // console.log(
+            //   `🎵 Creating new Howl instance for ${slotKey} with src: ${audioFile}`
+            // );
 
             // Test if we can create a basic HTML5 audio element first
             try {
               const testAudio = new Audio(audioFile);
               testAudio.addEventListener("canplaythrough", () => {
-                console.log(`✅ HTML5 Audio can load: ${audioFile}`);
+                // console.log(`✅ HTML5 Audio can load: ${audioFile}`);
               });
               testAudio.addEventListener("error", (e) => {
-                console.error(`❌ HTML5 Audio failed: ${audioFile}`, e);
+                // console.error(`❌ HTML5 Audio failed: ${audioFile}`, e);
               });
               testAudio.load();
             } catch (e) {
-              console.error(
-                `❌ Failed to create HTML5 Audio element for: ${audioFile}`,
-                e
-              );
+              // console.error(
+              //   `❌ Failed to create HTML5 Audio element for: ${audioFile}`,
+              //   e
+              // );
             }
 
             const howl = new Howl({
@@ -96,37 +96,37 @@ export function useHowlerAudio({
               html5: true, // Enable HTML5 audio as fallback for compatibility
               autoplay: false,
               onload: () => {
-                console.log(`🎵 Howl loaded: ${slotKey} - ${audioFile}`);
+                // console.log(`🎵 Howl loaded: ${slotKey} - ${audioFile}`);
               },
               onloaderror: (id: number, error: any) => {
-                console.error(`❌ Howl load error for ${slotKey}:`, {
-                  error,
-                  src: audioFile,
-                  soundName: sound.name,
-                  soundId: sound.id,
-                  isCustom: sound.isCustom,
-                  errorDetails:
-                    typeof error === "object" ? JSON.stringify(error) : error,
-                });
+                // console.error(`❌ Howl load error for ${slotKey}:`, {
+                //   error,
+                //   src: audioFile,
+                //   soundName: sound.name,
+                //   soundId: sound.id,
+                //   isCustom: sound.isCustom,
+                //   errorDetails:
+                //     typeof error === "object" ? JSON.stringify(error) : error,
+                // });
 
                 // Try to test if the URL is accessible
                 fetch(audioFile, { method: "HEAD" })
                   .then((response) => {
-                    console.log(`🔍 URL accessibility test for ${audioFile}:`, {
-                      status: response.status,
-                      contentType: response.headers.get("content-type"),
-                      url: audioFile,
-                    });
+                    // console.log(`🔍 URL accessibility test for ${audioFile}:`, {
+                    //   status: response.status,
+                    //   contentType: response.headers.get("content-type"),
+                    //   url: audioFile,
+                    // });
                   })
                   .catch((fetchError) => {
-                    console.error(
-                      `🔍 URL fetch test failed for ${audioFile}:`,
-                      fetchError
-                    );
+                    // console.error(
+                    //   `🔍 URL fetch test failed for ${audioFile}:`,
+                    //   fetchError
+                    // );
                   });
               },
               onplayerror: (id: number, error: any) => {
-                console.error(`❌ Howl play error for ${slotKey}:`, error);
+                // console.error(`❌ Howl play error for ${slotKey}:`, error);
                 // Try to unlock audio on mobile
                 howl.once("unlock", () => {
                   howl.play();
