@@ -35,3 +35,28 @@ documentation/
 *.wav
 *.m4a
 *.flac
+
+# Sensitive files and directories
+scripts/
+sql/
+docs/setup-guides/
+docs/schemas-and-presets/
+docs/phases/
+
+# Database and configuration files
+*.sql
+database-setup.sql
+fix-rls-policies.sql
+quick-database-setup.sql
+builtin_sounds_setup.sql
+fix_preset_schema.sql
+sounds_schema.sql
+
+# Supabase configuration
+supabase/
+.supabase/
+
+# API keys and secrets
+.env.local
+.env.production
+.env.development
