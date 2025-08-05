@@ -1,8 +1,8 @@
-// Import SVG icons for consistency
-import windSvg from "../assets/svg/wind.svg";
-import musicSvg from "../assets/svg/music.svg";
-import coffeeSvg from "../assets/svg/coffee.svg";
-import micSvg from "../assets/svg/mic.svg";
+// SVG icon paths from public directory
+const windSvg = "/svg/wind.svg";
+const musicSvg = "/svg/music.svg";
+const coffeeSvg = "/svg/coffee.svg";
+const micSvg = "/svg/mic.svg";
 
 // Built-in sound type (local files)
 export interface BuiltInSound {

@@ -83,16 +83,15 @@ export function useSoundPresets(): UseSoundPresetsReturn {
       allSounds.length > 0
     ) {
       const defaultSelections: SoundSelections = {};
-      const builtInKeys = [
-        "ocean",
-        "rain",
-        "chimes",
-        "fire",
-        "crickets",
-        "wind",
-      ];
+      // Use actual built-in sound keys instead of hardcoded list
+      const builtInKeys = BUILT_IN_SOUNDS.map((s) => s.key);
+      console.log("🔍 All built-in sound keys:", builtInKeys);
 
-      builtInKeys.forEach((key) => {
+      // Only use the first 6 built-in sounds for default selections (to match UI slots)
+      const defaultBuiltInKeys = builtInKeys.slice(0, 6);
+      console.log("🔍 Default built-in keys for slots:", defaultBuiltInKeys);
+
+      defaultBuiltInKeys.forEach((key) => {
         const defaultSound = allSounds.find(
           (sound) =>
             !sound.isCustom && "key" in sound && (sound as any).key === key
@@ -102,6 +101,7 @@ export function useSoundPresets(): UseSoundPresetsReturn {
         }
       });
 
+      console.log("🔍 Default sound selections:", defaultSelections);
       setCurrentSoundSelections(defaultSelections);
     }
   }, [allSounds.length, currentSoundSelections]);
@@ -265,19 +265,30 @@ export function useSoundPresets(): UseSoundPresetsReturn {
 
     try {
       const builtInKeys = BUILT_IN_SOUNDS.map((s) => s.key);
+      console.log("🔍 Preset Debug - Built-in sound keys:", builtInKeys);
+      console.log(
+        "🔍 Preset Debug - Current volumes from context:",
+        currentVolumes
+      );
+
       const sounds = convertUIVolumeToDatabase(currentVolumes, builtInKeys);
+      console.log("🔍 Preset Debug - Converted sounds for database:", sounds);
 
       const presetInput: CreatePresetInput = {
         name,
         description,
         sounds,
       };
+      console.log("🔍 Preset Debug - Final preset input:", presetInput);
 
       const preset = await PresetService.savePreset(user.id, presetInput);
+      console.log("✅ Preset Debug - Successfully saved preset:", preset);
+
       await refreshPresets();
 
       return preset;
     } catch (err) {
+      console.error("❌ Preset Debug - Error saving preset:", err);
       setError(err instanceof Error ? err.message : "Failed to save preset");
       throw err;
     } finally {

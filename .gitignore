@@ -29,3 +29,9 @@ dist-ssr
 
 # Documentation folder
 documentation/
+
+# Large audio files - temporarily excluded
+*.mp3
+*.wav
+*.m4a
+*.flac

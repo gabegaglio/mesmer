@@ -1,13 +1,13 @@
-// Import SVG icons
-import oceanSvg from "../assets/svg/ocean.svg";
-import rainSvg from "../assets/svg/rain.svg";
-import fireSvg from "../assets/svg/fire.svg";
-import cricketsSvg from "../assets/svg/crickets.svg";
-import windSvg from "../assets/svg/wind.svg";
-import musicSvg from "../assets/svg/music.svg";
-import chimesSvg from "../assets/svg/chimes.svg";
-import coffeeSvg from "../assets/svg/coffee.svg";
-import micSvg from "../assets/svg/mic.svg";
+// SVG icon paths from public directory
+const oceanSvg = "/svg/ocean.svg";
+const rainSvg = "/svg/rain.svg";
+const fireSvg = "/svg/fire.svg";
+const cricketsSvg = "/svg/crickets.svg";
+const windSvg = "/svg/wind.svg";
+const musicSvg = "/svg/music.svg";
+const chimesSvg = "/svg/chimes.svg";
+const coffeeSvg = "/svg/coffee.svg";
+const micSvg = "/svg/mic.svg";
 
 export interface BuiltInSound {
   id: string;
@@ -26,7 +26,7 @@ export const BUILT_IN_SOUNDS: BuiltInSound[] = [
   {
     id: "ocean-waves",
     key: "ocean",
-    name: "Ocean Waves",
+    name: "Waves",
     fileName: "ocean.mp3",
     category: "Nature",
     audioFile: "/presets/nature/ocean.mp3",
@@ -37,7 +37,7 @@ export const BUILT_IN_SOUNDS: BuiltInSound[] = [
   {
     id: "gentle-rain",
     key: "rain",
-    name: "Gentle Rain",
+    name: "Rain",
     fileName: "rain.mp3",
     category: "Nature",
     audioFile: "/presets/nature/rain.mp3",
@@ -48,7 +48,7 @@ export const BUILT_IN_SOUNDS: BuiltInSound[] = [
   {
     id: "crackling-fire",
     key: "fire",
-    name: "Crackling Fire",
+    name: "Fire",
     fileName: "fire.mp3",
     category: "Nature",
     audioFile: "/presets/nature/fire.mp3",
@@ -59,7 +59,7 @@ export const BUILT_IN_SOUNDS: BuiltInSound[] = [
   {
     id: "chirping-crickets",
     key: "crickets",
-    name: "Chirping Crickets",
+    name: "Crickets",
     fileName: "crickets.mp3",
     category: "Nature",
     audioFile: "/presets/nature/crickets.mp3",
@@ -70,7 +70,7 @@ export const BUILT_IN_SOUNDS: BuiltInSound[] = [
   {
     id: "whispering-wind",
     key: "wind",
-    name: "Whispering Wind",
+    name: "Wind",
     fileName: "wind.mp3",
     category: "Nature",
     audioFile: "/presets/nature/wind.mp3",
@@ -129,7 +129,7 @@ export const BUILT_IN_SOUNDS: BuiltInSound[] = [
   {
     id: "distant-chimes",
     key: "chimes",
-    name: "Distant Chimes",
+    name: "Chimes",
     fileName: "chimes.mp3",
     category: "Urban",
     audioFile: "/presets/urban/chimes.mp3",

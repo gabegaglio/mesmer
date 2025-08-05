@@ -1,8 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import type { Sound } from "../../types/sound";
 import { type ThemeMode } from "../../hooks/useTheme";
-import trashIcon from "../../assets/svg/trash.svg";
-import { shouldInvertIcons } from "../../utils/themeUtils";
+
+// SVG icon path from public directory
+const trashIcon = "/svg/trash.svg";
+import {
+  shouldInvertIcons,
+  getGlassmorphicClasses,
+  getSelectedGlassmorphicStyles,
+} from "../../utils/themeUtils";
 
 interface SoundItemProps {
   sound: Sound;
@@ -217,21 +223,7 @@ function SoundItem({
   return (
     <div
       className={`flex items-center justify-between p-3 mb-2 rounded-xl transition-all duration-200 cursor-pointer backdrop-blur-sm border ${
-        isSelected
-          ? themeMode === "slate"
-            ? "bg-blue-500/20 border-blue-400/30 text-white"
-            : themeMode === "day"
-            ? "bg-blue-500/25 border-blue-400/40 text-white"
-            : themeMode === "midnight"
-            ? "bg-purple-500/30 border-purple-400/40 text-white"
-            : "bg-blue-500/25 border-blue-400/30 text-white"
-          : themeMode === "slate"
-          ? "bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
-          : themeMode === "day"
-          ? "bg-white/15 border-white/25 text-white hover:bg-white/25 hover:border-white/35"
-          : themeMode === "midnight"
-          ? "bg-black/15 border-purple-500/20 text-white hover:bg-black/25 hover:border-purple-400/30"
-          : "bg-black/10 border-white/15 text-white hover:bg-black/20 hover:border-white/25"
+        isSelected ? getSelectedGlassmorphicStyles() : getGlassmorphicClasses()
       }`}
       onClick={() => onSelect(sound)}
     >
@@ -251,13 +243,7 @@ function SoundItem({
           className={`p-1.5 rounded-lg transition-all duration-200 backdrop-blur-sm border cursor-pointer ${
             isPlaying
               ? "bg-red-500/80 border-red-400/50 text-white"
-              : themeMode === "slate"
-              ? "bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white"
-              : themeMode === "day"
-              ? "bg-white/15 border-white/25 text-white hover:bg-white/25 hover:text-white"
-              : themeMode === "midnight"
-              ? "bg-black/15 border-purple-500/20 text-gray-300 hover:bg-black/25 hover:text-white"
-              : "bg-black/10 border-white/15 text-gray-400 hover:bg-black/20 hover:text-white"
+              : getGlassmorphicClasses()
           }`}
           onClick={handlePreview}
           aria-label={isPlaying ? "Stop preview" : "Preview sound"}
@@ -276,15 +262,7 @@ function SoundItem({
         {/* Delete Button - Only show for custom sounds in Custom category */}
         {showDeleteButton && sound.isCustom && (
           <button
-            className={`p-1.5 rounded-lg transition-all duration-200 backdrop-blur-sm border cursor-pointer ${
-              themeMode === "slate"
-                ? "bg-white/10 border-white/20 text-white hover:bg-red-100/50 hover:border-red-300/50 hover:text-red-700"
-                : themeMode === "day"
-                ? "bg-white/15 border-white/25 text-white hover:bg-red-100/60 hover:border-red-300/60 hover:text-red-700"
-                : themeMode === "midnight"
-                ? "bg-black/15 border-purple-500/20 text-gray-400 hover:bg-red-500/20 hover:border-red-400/30 hover:text-red-300"
-                : "bg-black/10 border-white/15 text-gray-400 hover:bg-red-500/20 hover:border-red-400/30 hover:text-red-300"
-            }`}
+            className={`p-1.5 rounded-lg transition-all duration-200 backdrop-blur-sm border cursor-pointer ${getGlassmorphicClasses()} hover:bg-red-500/20 hover:border-red-400/30 hover:text-red-300`}
             onClick={handleDelete}
             aria-label="Delete sound"
           >
@@ -292,9 +270,7 @@ function SoundItem({
               src={trashIcon}
               alt="Delete"
               className={`w-3 h-3 ${
-                shouldInvertIcons(themeMode || "slate")
-                  ? "brightness-0 invert"
-                  : ""
+                shouldInvertIcons() ? "brightness-0 invert" : ""
               }`}
             />
           </button>

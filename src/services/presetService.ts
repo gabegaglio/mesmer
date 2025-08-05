@@ -51,6 +51,9 @@ export class PresetService {
     preset: CreatePresetInput
   ): Promise<SoundPresetRecord> {
     try {
+      console.log("🔍 PresetService Debug - Saving preset for user:", userId);
+      console.log("🔍 PresetService Debug - Preset input:", preset);
+
       // Create the preset record
       const { data: presetRecord, error: presetError } = await supabase
         .from("sound_presets")
@@ -64,8 +67,17 @@ export class PresetService {
         .single();
 
       if (presetError) {
+        console.error(
+          "❌ PresetService Debug - Error creating preset:",
+          presetError
+        );
         throw new Error(`Failed to create preset: ${presetError.message}`);
       }
+
+      console.log(
+        "✅ PresetService Debug - Created preset record:",
+        presetRecord
+      );
 
       // Create preset_sounds records
       if (preset.sounds.length > 0) {
@@ -78,11 +90,21 @@ export class PresetService {
           sort_order: sound.sortOrder ?? index,
         }));
 
+        console.log(
+          "🔍 PresetService Debug - Preset sounds to insert:",
+          presetSounds
+        );
+
         const { error: soundsError } = await supabase
           .from("preset_sounds")
           .insert(presetSounds);
 
         if (soundsError) {
+          console.error(
+            "❌ PresetService Debug - Error creating preset sounds:",
+            soundsError
+          );
+
           // Clean up the preset if sounds insertion fails
           await supabase
             .from("sound_presets")
@@ -93,12 +115,18 @@ export class PresetService {
             `Failed to save preset sounds: ${soundsError.message}`
           );
         }
+
+        console.log(
+          "✅ PresetService Debug - Successfully inserted preset sounds"
+        );
       }
 
       // Return the complete preset with sounds
-      return await this.getPresetById(presetRecord.id, userId);
+      const result = await this.getPresetById(presetRecord.id, userId);
+      console.log("✅ PresetService Debug - Final preset result:", result);
+      return result;
     } catch (error) {
-      console.error("Error in savePreset:", error);
+      console.error("❌ PresetService Debug - Error in savePreset:", error);
       throw error;
     }
   }

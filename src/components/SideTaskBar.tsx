@@ -4,9 +4,11 @@ import { Link } from "react-router-dom";
 import { type ThemeMode } from "../hooks/useTheme";
 import { useAuth } from "../contexts/AuthContext";
 import { supabase } from "../lib/supabase";
-import starSvg from "../assets/svg/star.svg";
-import menuSvg from "../assets/svg/menu.svg";
-import { getCompleteTheme, shouldInvertIcons } from "../utils/themeUtils";
+import { getGlassmorphicClasses, shouldInvertIcons } from "../utils/themeUtils";
+
+// SVG icon paths from public directory
+const starSvg = "/svg/star.svg";
+const menuSvg = "/svg/menu.svg";
 
 interface SideTaskBarProps {
   themeMode: ThemeMode;

@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { type ThemeMode } from "../../hooks/useTheme";
+import { getGlassmorphicClasses } from "../../utils/themeUtils";
 
 interface ResetButtonProps {
   themeMode: ThemeMode;
@@ -7,22 +8,10 @@ interface ResetButtonProps {
 }
 
 function ResetButton({ themeMode, onClick }: ResetButtonProps) {
-  const getButtonStyles = () => {
-    switch (themeMode) {
-      case "slate":
-        return "bg-white/15 border-white/25 text-gray-800 hover:bg-white/25";
-      case "day":
-        return "bg-white/20 border-white/30 text-white hover:bg-white/30";
-      case "night":
-      case "midnight":
-        return "bg-black/20 border-white/10 text-white hover:bg-black/30";
-    }
-  };
-
   return (
     <motion.button
       onClick={onClick}
-      className={`w-12 h-12 rounded-2xl backdrop-blur-sm border transition-all duration-150 flex items-center justify-center cursor-pointer ${getButtonStyles()}`}
+      className={`w-12 h-12 rounded-2xl backdrop-blur-sm border transition-all duration-150 flex items-center justify-center cursor-pointer ${getGlassmorphicClasses()}`}
       whileHover={{ scale: 1.05, opacity: 0.9 }}
       whileTap={{ scale: 0.95 }}
       transition={{ duration: 0.1 }}
