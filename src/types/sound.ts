@@ -1,8 +1,8 @@
 // SVG icon paths from public directory
-const windSvg = "/svg/wind.svg";
-const musicSvg = "/svg/music.svg";
-const coffeeSvg = "/svg/coffee.svg";
-const micSvg = "/svg/mic.svg";
+const windSvg = "/mesmer/svg/wind.svg";
+const musicSvg = "/mesmer/svg/music.svg";
+const coffeeSvg = "/mesmer/svg/coffee.svg";
+const micSvg = "/mesmer/svg/mic.svg";
 
 // Built-in sound type (local files)
 export interface BuiltInSound {

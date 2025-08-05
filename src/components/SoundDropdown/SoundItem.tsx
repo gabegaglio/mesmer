@@ -3,7 +3,7 @@ import type { Sound } from "../../types/sound";
 import { type ThemeMode } from "../../hooks/useTheme";
 
 // SVG icon path from public directory
-const trashIcon = "/svg/trash.svg";
+const trashIcon = "/mesmer/svg/trash.svg";
 import {
   shouldInvertIcons,
   getGlassmorphicClasses,

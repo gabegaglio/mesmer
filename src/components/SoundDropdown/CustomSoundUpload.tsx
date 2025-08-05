@@ -11,16 +11,16 @@ import {
 } from "../../utils/themeUtils";
 
 // SVG icon paths from public directory
-const micSvg = "/svg/mic.svg";
-const musicSvg = "/svg/music.svg";
-const coffeeSvg = "/svg/coffee.svg";
-const oceanSvg = "/svg/ocean.svg";
-const rainSvg = "/svg/rain.svg";
-const fireSvg = "/svg/fire.svg";
-const cricketsSvg = "/svg/crickets.svg";
-const windSvg = "/svg/wind.svg";
-const chimesSvg = "/svg/chimes.svg";
-const starSvg = "/svg/star.svg";
+const micSvg = "/mesmer/svg/mic.svg";
+const musicSvg = "/mesmer/svg/music.svg";
+const coffeeSvg = "/mesmer/svg/coffee.svg";
+const oceanSvg = "/mesmer/svg/ocean.svg";
+const rainSvg = "/mesmer/svg/rain.svg";
+const fireSvg = "/mesmer/svg/fire.svg";
+const cricketsSvg = "/mesmer/svg/crickets.svg";
+const windSvg = "/mesmer/svg/wind.svg";
+const chimesSvg = "/mesmer/svg/chimes.svg";
+const starSvg = "/mesmer/svg/star.svg";
 
 // Available icons for custom sounds
 const AVAILABLE_ICONS = [

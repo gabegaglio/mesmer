@@ -2,14 +2,14 @@ import { supabase } from "../lib/supabase";
 import type { BuiltInSound } from "../types/sound";
 
 // SVG icon paths from public directory
-const windSvg = "/svg/wind.svg";
-const rainSvg = "/svg/rain.svg";
-const oceanSvg = "/svg/ocean.svg";
-const fireSvg = "/svg/fire.svg";
-const cricketsSvg = "/svg/crickets.svg";
-const starSvg = "/svg/star.svg";
-const coffeeSvg = "/svg/coffee.svg";
-const chimesSvg = "/svg/chimes.svg";
+const windSvg = "/mesmer/svg/wind.svg";
+const rainSvg = "/mesmer/svg/rain.svg";
+const oceanSvg = "/mesmer/svg/ocean.svg";
+const fireSvg = "/mesmer/svg/fire.svg";
+const cricketsSvg = "/mesmer/svg/crickets.svg";
+const starSvg = "/mesmer/svg/star.svg";
+const coffeeSvg = "/mesmer/svg/coffee.svg";
+const chimesSvg = "/mesmer/svg/chimes.svg";
 
 // Icon mapping
 const ICON_MAP: Record<string, string> = {

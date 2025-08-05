@@ -7,8 +7,8 @@ import { supabase } from "../lib/supabase";
 import { getGlassmorphicClasses, shouldInvertIcons } from "../utils/themeUtils";
 
 // SVG icon paths from public directory
-const starSvg = "/svg/star.svg";
-const menuSvg = "/svg/menu.svg";
+const starSvg = "/mesmer/svg/star.svg";
+const menuSvg = "/mesmer/svg/menu.svg";
 
 interface SideTaskBarProps {
   themeMode: ThemeMode;
