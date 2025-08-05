@@ -8,6 +8,7 @@ console.log("  URL:", supabaseUrl);
 console.log("  Key exists:", !!supabaseAnonKey);
 console.log("  Environment:", import.meta.env.MODE);
 console.log("  Base URL:", import.meta.env.BASE_URL);
+console.log("  Production:", import.meta.env.PROD);
 
 let supabase: any;
 
