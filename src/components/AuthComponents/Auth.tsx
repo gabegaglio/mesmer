@@ -92,7 +92,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-950 to-black flex items-center justify-center p-4">
+    <div className="full-viewport bg-gradient-to-br from-gray-900 via-purple-950 to-black flex items-center justify-center p-4">
       {/* Main Container */}
       <div className="w-full max-w-7xl bg-black/80 backdrop-blur-xl border border-purple-900/30 rounded-3xl shadow-2xl overflow-hidden relative">
         {/* Back Button */}

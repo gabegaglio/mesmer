@@ -76,7 +76,7 @@ function AppContent() {
     }
   };
 
-  const backgroundClass = `min-h-screen transition-colors duration-800 ${getThemeBackgroundClass(
+  const backgroundClass = `full-viewport transition-colors duration-800 ${getThemeBackgroundClass(
     themeMode
   )}`;
 
