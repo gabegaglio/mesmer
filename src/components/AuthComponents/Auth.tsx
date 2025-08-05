@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import { supabase } from "../../lib/supabase";
 import GoogleIcon from "./GoogleIcon";
 
 const Auth = () => {
@@ -16,12 +17,16 @@ const Auth = () => {
   const { signUp, signIn, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
 
+  // Check if authentication is available
+  const isAuthAvailable =
+    supabase && supabase.auth && typeof supabase.auth.getSession === "function";
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
-    // Clear error when user staFailed to load url /src/components/Auth.tsx (resolved id: /Users/gabe/cursorProjects/mesmer/src/components/Auth.tsx) in /Users/gabe/cursorProjects/mesmer/src/App.tsx. Does the file exist?rts typing
+    // Clear error when user starts typing
     if (error) setError("");
   };
 
@@ -157,6 +162,32 @@ const Auth = () => {
                 </div>
               )}
 
+              {!isAuthAvailable && (
+                <div className="mb-6 p-4 rounded-lg text-sm border bg-yellow-500/10 text-yellow-400 border-yellow-500/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <svg
+                      className="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span className="font-semibold">
+                      Authentication Not Available
+                    </span>
+                  </div>
+                  <p className="text-xs opacity-90">
+                    Authentication is currently disabled. This may be due to
+                    missing environment variables in the deployment. The app
+                    will work in demo mode without user features.
+                  </p>
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-4 mb-6">
                 <div>
                   <input
@@ -168,7 +199,7 @@ const Auth = () => {
                     className="w-full px-4 py-4 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-200 cursor-text"
                     placeholder="Email address"
                     required
-                    disabled={loading}
+                    disabled={loading || !isAuthAvailable}
                   />
                 </div>
 
@@ -182,7 +213,7 @@ const Auth = () => {
                     className="w-full px-4 py-4 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-200 cursor-text"
                     placeholder="Enter your password"
                     required
-                    disabled={loading}
+                    disabled={loading || !isAuthAvailable}
                   />
                 </div>
 
@@ -197,14 +228,14 @@ const Auth = () => {
                       className="w-full px-4 py-4 bg-gray-900/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-200 cursor-text"
                       placeholder="Confirm your password"
                       required
-                      disabled={loading}
+                      disabled={loading || !isAuthAvailable}
                     />
                   </div>
                 )}
 
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || !isAuthAvailable}
                   className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-4 px-6 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg cursor-pointer"
                 >
                   {loading ? (
@@ -212,6 +243,8 @@ const Auth = () => {
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                       {isLogin ? "Signing in..." : "Creating account..."}
                     </div>
+                  ) : !isAuthAvailable ? (
+                    "Authentication Disabled"
                   ) : isLogin ? (
                     "Sign in"
                   ) : (
@@ -234,7 +267,7 @@ const Auth = () => {
               <div className="space-y-3 mb-8">
                 <button
                   onClick={handleGoogleSignIn}
-                  disabled={loading}
+                  disabled={loading || !isAuthAvailable}
                   className="w-full bg-gray-900/50 hover:bg-gray-800/50 border border-gray-700/50 text-white font-medium py-4 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <GoogleIcon className="w-5 h-5" />

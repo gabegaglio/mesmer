@@ -40,7 +40,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     // Don't proceed if supabase is not available
     if (!supabase) {
-      console.log("Supabase not available, skipping auth setup");
+      console.log("❌ Supabase not available, skipping auth setup");
+      setLoading(false);
+      return;
+    }
+
+    // Check if this is a mock client (authentication disabled)
+    if (!supabase.auth || typeof supabase.auth.getSession !== "function") {
+      console.log("⚠️ Using mock Supabase client - authentication disabled");
       setLoading(false);
       return;
     }
@@ -100,7 +107,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setSession(session);
           setUser(session?.user ?? null);
         }
-        setLoading(false);
       }
     );
 
