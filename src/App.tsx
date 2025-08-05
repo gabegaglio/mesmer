@@ -35,7 +35,7 @@ function AppContent() {
 
   return (
     <div className={backgroundClass}>
-      <Router>
+      <Router basename="/mesmer">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/auth" element={<Auth />} />
