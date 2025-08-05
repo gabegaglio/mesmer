@@ -117,7 +117,7 @@ export class SupabaseSoundService {
       }
 
       const sounds = await Promise.all(
-        data.map(async (sound) => {
+        data.map(async (sound: any) => {
           const customSound = this.mapToCustomSound(sound);
           customSound.audioFile = await this.getSignedUrl(sound.file_path);
           return customSound;
@@ -307,7 +307,10 @@ export class SupabaseSoundService {
         throw new Error(`Failed to get storage usage: ${error.message}`);
       }
 
-      const totalSize = data.reduce((sum, sound) => sum + sound.file_size, 0);
+      const totalSize = data.reduce(
+        (sum: any, sound: any) => sum + sound.file_size,
+        0
+      );
 
       return {
         totalFiles: data.length,
