@@ -328,7 +328,7 @@ export function Weather({
         `}
       </style>
       <div
-        className={`fixed select-none z-10 top-32 left-1/2 transform -translate-x-1/2 sm:top-36 md:top-16 lg:top-1/2 lg:-translate-y-full lg:-mt-32 transition-all duration-500 ${styles.textColor} weather-mobile ${className}`}
+        className={`fixed select-none z-10 top-32 left-1/2 transform -translate-x-1/2 sm:top-36 md:top-24 lg:top-1/2 lg:-translate-y-full lg:-mt-32 transition-all duration-500 ${styles.textColor} weather-mobile ${className}`}
         style={{
           fontFamily: "'Inter', 'SF Pro Display', 'Segoe UI', sans-serif",
         }}
