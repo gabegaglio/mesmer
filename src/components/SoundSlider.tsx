@@ -39,7 +39,7 @@ export default function SoundSlider({
     selectedSounds,
     setVolumes,
     setSelectedSounds,
-    handleVolumeChange,
+    handleVolumeChange: originalHandleVolumeChange,
     handleSoundChange,
     getDefaultSound,
   } = useSlotAudio();
@@ -69,6 +69,18 @@ export default function SoundSlider({
     volumes,
     isMuted,
   });
+
+  // Enhanced volume change handler that updates both state and audio
+  const handleVolumeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const slotKey = event.target.name as SlotKey;
+    const volume = parseInt(event.target.value);
+
+    // Update local state
+    originalHandleVolumeChange(event);
+
+    // Update audio volume immediately
+    updateVolume(slotKey, volume);
+  };
 
   // UI state
   const [isMediumScreen, setIsMediumScreen] = useState(false);
@@ -196,6 +208,9 @@ export default function SoundSlider({
                   name={key}
                   value={volumes[key as SlotKey]}
                   onChange={handleVolumeChange}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  onTouchMove={(e) => e.stopPropagation()}
+                  onTouchEnd={(e) => e.stopPropagation()}
                   style={{
                     transform: isMediumScreen
                       ? "rotate(270deg)"
@@ -207,6 +222,10 @@ export default function SoundSlider({
                     borderRadius: "12px",
                     outline: "none",
                     WebkitAppearance: "none",
+                    WebkitTouchCallout: "none",
+                    WebkitUserSelect: "none",
+                    userSelect: "none",
+                    touchAction: "none",
                     transition: "opacity 0.2s ease-out",
                   }}
                 />

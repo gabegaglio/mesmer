@@ -278,12 +278,22 @@ body {
   -webkit-appearance: none;
   background: transparent;
   cursor: pointer;
+  /* iOS touch improvements */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
 }
 
+/* iOS-specific slider styles */
 .slider::-webkit-slider-track {
   background: inherit;
   border-radius: 12px;
   height: 100%;
+  /* iOS touch improvements */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .slider::-webkit-slider-thumb {
@@ -296,12 +306,24 @@ body {
   width: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
+  /* iOS touch improvements */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
 }
 
 .slider::-webkit-slider-thumb:hover {
   background: rgba(255, 255, 255, 1);
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* iOS touch improvements for thumb */
+.slider::-webkit-slider-thumb:active {
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.2);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
 .slider::-moz-range-track {
@@ -333,5 +355,30 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* iOS-specific improvements */
+@supports (-webkit-touch-callout: none) {
+  .slider {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .slider::-webkit-slider-thumb {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Prevent iOS zoom on double-tap */
+  input[type="range"] {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
   }
 }
