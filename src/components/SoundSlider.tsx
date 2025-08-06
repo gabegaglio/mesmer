@@ -8,6 +8,7 @@ import { useSlotAudio } from "../hooks/useSlotAudio";
 import { useHowlerAudio } from "../hooks/useHowlerAudio";
 import { useAudioControls } from "../hooks/useAudioControls";
 import Clock from "./Clock";
+import Weather from "./Weather";
 import { type ThemeMode } from "../hooks/useTheme";
 import type { SlotKey } from "../hooks/useHowlerAudio";
 
@@ -15,6 +16,9 @@ interface SoundSliderProps {
   themeMode: ThemeMode;
   nightEffectsEnabled: boolean;
   clockEnabled: boolean;
+  weatherEnabled: boolean;
+  weatherAvailable: boolean;
+  onWeatherAvailable?: (available: boolean) => void;
   stars: Array<{ x: number; y: number; id: number }>;
 }
 
@@ -22,6 +26,9 @@ export default function SoundSlider({
   themeMode,
   nightEffectsEnabled,
   clockEnabled,
+  weatherEnabled,
+  weatherAvailable,
+  onWeatherAvailable,
   stars,
 }: SoundSliderProps) {
   const { allSounds, setCurrentVolumes } = useSounds();
@@ -153,6 +160,14 @@ export default function SoundSlider({
 
       {/* Clock */}
       {clockEnabled && <Clock themeMode={themeMode} />}
+
+      {/* Weather */}
+      {weatherEnabled && (
+        <Weather
+          themeMode={themeMode}
+          onWeatherAvailable={onWeatherAvailable}
+        />
+      )}
 
       <div className={`w-fit h-fit mt-0 md:mt-12`}>
         <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6">

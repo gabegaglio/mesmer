@@ -12,6 +12,7 @@ export function useNightMode() {
     updateTheme,
     updateStarsEnabled,
     updateClockEnabled,
+    updateWeatherEnabled,
   } = useUserSettings();
 
   // Local state for when user is not logged in
@@ -19,6 +20,7 @@ export function useNightMode() {
   const [localNightEffectsEnabled, setLocalNightEffectsEnabled] =
     useState(true);
   const [localClockEnabled, setLocalClockEnabled] = useState(true);
+  const [localWeatherEnabled, setLocalWeatherEnabled] = useState(true);
 
   const [stars, setStars] = useState<
     Array<{ x: number; y: number; id: number }>
@@ -30,6 +32,8 @@ export function useNightMode() {
     user && settings ? settings.stars_enabled : localNightEffectsEnabled;
   const clockEnabled =
     user && settings ? settings.clock_enabled : localClockEnabled;
+  const weatherEnabled =
+    user && settings ? settings.weather_enabled : localWeatherEnabled;
 
   const cycleTheme = () => {
     const getNextTheme = (current: ThemeMode): ThemeMode => {
@@ -96,6 +100,14 @@ export function useNightMode() {
     }
   };
 
+  const toggleWeather = (enabled: boolean) => {
+    if (user && settings) {
+      updateWeatherEnabled(enabled);
+    } else {
+      setLocalWeatherEnabled(enabled);
+    }
+  };
+
   // Backward compatibility
   const isNightMode = themeMode === "night";
   const toggleDayNight = cycleTheme;
@@ -122,12 +134,14 @@ export function useNightMode() {
     isNightMode,
     nightEffectsEnabled,
     clockEnabled,
+    weatherEnabled,
     stars,
     cycleTheme,
     setTheme,
     toggleDayNight,
     toggleNightEffects,
     toggleClock,
+    toggleWeather,
     settingsLoading,
   };
 }

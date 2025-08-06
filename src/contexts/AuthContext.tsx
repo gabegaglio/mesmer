@@ -151,8 +151,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
 
     try {
-      // Use the exact GitHub Pages URL for production
-      const redirectUrl = "https://gabegaglio.github.io/mesmer/";
+      // Use current environment URL
+      const redirectUrl = import.meta.env.PROD
+        ? "https://gabegaglio.github.io/mesmer/"
+        : "http://localhost:5173/mesmer/";
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",

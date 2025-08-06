@@ -6,6 +6,7 @@ export interface UserSettings {
   theme_mode: ThemeMode;
   stars_enabled: boolean;
   clock_enabled: boolean;
+  weather_enabled: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -14,6 +15,7 @@ export interface UserSettingsUpdate {
   theme_mode?: ThemeMode;
   stars_enabled?: boolean;
   clock_enabled?: boolean;
+  weather_enabled?: boolean;
 }
 
 export interface UserSettingsInsert {
@@ -21,4 +23,5 @@ export interface UserSettingsInsert {
   theme_mode?: ThemeMode;
   stars_enabled?: boolean;
   clock_enabled?: boolean;
+  weather_enabled?: boolean;
 }

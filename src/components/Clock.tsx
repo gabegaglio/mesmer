@@ -78,13 +78,14 @@ export function Clock({ themeMode, clockEnabled = true }: ClockProps) {
         `}
       </style>
       <div
-        className={`fixed pointer-events-none select-none z-10 top-6 left-1/2 transform -translate-x-1/2 sm:top-8 md:top-1/2 md:-translate-y-full md:-mt-40 transition-all duration-500 ${styles.textColor} clock-mobile`}
+        className={`fixed pointer-events-none select-none z-10 top-16 left-1/2 transform -translate-x-1/2 sm:top-20 md:top-4 lg:top-1/2 lg:-translate-y-full lg:-mt-48 transition-all duration-500 ${styles.textColor} clock-mobile`}
         style={{
           fontFamily: "'Inter', 'SF Pro Display', 'Segoe UI', sans-serif",
         }}
       >
+        {/* Time Display */}
         <div
-          className="text-3xl xs:text-4xl sm:text-5xl md:text-8xl font-black tracking-tight whitespace-nowrap drop-shadow-lg"
+          className="text-5xl xs:text-6xl sm:text-7xl md:text-8xl font-black tracking-tight whitespace-nowrap drop-shadow-lg text-center"
           style={{
             fontWeight: 900,
             letterSpacing: "-0.02em",

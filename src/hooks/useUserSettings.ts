@@ -168,6 +168,14 @@ export function useUserSettings() {
     [updateSettings]
   );
 
+  const updateWeatherEnabled = useCallback(
+    (weather_enabled: boolean) => {
+      // console.log("🌤️ Updating weather enabled:", weather_enabled);
+      updateSettings({ weather_enabled });
+    },
+    [updateSettings]
+  );
+
   // MAIN EFFECT: Handle auth state and initialize settings
   useEffect(() => {
     const handleAuthStateChange = async () => {
@@ -374,6 +382,7 @@ export function useUserSettings() {
     updateTheme,
     updateStarsEnabled,
     updateClockEnabled,
+    updateWeatherEnabled,
     saveImmediately,
     reloadSettings: async () => {
       if (user?.id) {

@@ -25,6 +25,24 @@ body {
   padding-right: env(safe-area-inset-right);
 }
 
+/* Prevent scrolling on mobile devices */
+@media (max-width: 768px) {
+  html,
+  body {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+
+  #root {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+}
+
 .dark {
   background-color: #000000;
 }
