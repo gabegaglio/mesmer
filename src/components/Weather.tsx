@@ -348,7 +348,7 @@ export function Weather({
           </span>
 
           {/* Separator */}
-          <span className="text-lg xs:text-xl sm:text-2xl md:text-3xl opacity-60 hidden sm:inline">
+          <span className="text-lg xs:text-xl sm:text-2xl md:text-3xl opacity-60">
             •
           </span>
 
@@ -358,12 +358,12 @@ export function Weather({
           </span>
 
           {/* Separator */}
-          <span className="text-lg xs:text-xl sm:text-2xl md:text-3xl opacity-60 hidden sm:inline">
+          <span className="text-lg xs:text-xl sm:text-2xl md:text-3xl opacity-60 hidden 2xl:inline">
             •
           </span>
 
           {/* Conditions */}
-          <span className="text-lg xs:text-xl sm:text-2xl md:text-3xl opacity-80 tracking-wide drop-shadow-lg hidden sm:inline">
+          <span className="text-lg xs:text-xl sm:text-2xl md:text-3xl opacity-80 tracking-wide drop-shadow-lg hidden 2xl:inline">
             {weatherData.conditions}
           </span>
         </div>
