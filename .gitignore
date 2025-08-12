@@ -53,8 +53,10 @@ fix_preset_schema.sql
 sounds_schema.sql
 
 # Supabase configuration
-supabase/
 .supabase/
+supabase/config.toml
+supabase/seed.sql
+supabase/migrations/
 
 # API keys and secrets
 .env.local
