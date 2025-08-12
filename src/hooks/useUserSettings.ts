@@ -54,24 +54,18 @@ export function useUserSettings() {
           return;
         }
 
-        // console.log("📡 Updating settings in database:", updates);
-        const { data, error: updateError } = await supabase
-          .from("user_settings")
-          .update({
-            ...updates,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("user_id", user.id)
-          .select()
-          .single();
+        // console.log("📡 Updating settings via Edge Function:", updates);
+        const { data, error: updateError } = await supabase.functions.invoke('updateUserSettings', {
+          body: { settings: updates }
+        });
 
         if (updateError) {
-          console.error("❌ Database update error:", updateError);
+          console.error("❌ Edge Function update error:", updateError);
           throw updateError;
         }
 
-        // console.log("✅ Settings saved to database successfully");
-        setSettings(data);
+        // console.log("✅ Settings saved via Edge Function successfully");
+        setSettings(data.data);
         lastUpdateRef.current = now;
       } catch (err) {
         console.error("❌ Error updating settings:", err);
@@ -283,12 +277,8 @@ export function useUserSettings() {
             throw new Error("Supabase not available");
           }
 
-          // console.log("📡 Fetching settings from database for user:", user.id);
-          const { data, error: fetchError } = await supabase
-            .from("user_settings")
-            .select("*")
-            .eq("user_id", user.id)
-            .single();
+          // console.log("📡 Fetching settings via Edge Function for user:", user.id);
+          const { data, error: fetchError } = await supabase.functions.invoke('getUserSettings');
 
           let userSettings;
           if (fetchError) {
@@ -296,31 +286,30 @@ export function useUserSettings() {
             if (fetchError.code === "PGRST116") {
               // console.log("📝 No settings found, creating defaults");
 
-              // Create defaults inline
+              // Create defaults via Edge Function
               // console.log("📝 Creating default settings for user:", user.id);
-              const { data: defaultData, error: insertError } = await supabase
-                .from("user_settings")
-                .insert({
-                  user_id: user.id,
-                  theme_mode: "slate" as ThemeMode,
-                  stars_enabled: true,
-                  clock_enabled: true,
-                })
-                .select()
-                .single();
+              const { data: defaultData, error: insertError } = await supabase.functions.invoke('updateUserSettings', {
+                body: { 
+                  settings: {
+                    theme_mode: "slate" as ThemeMode,
+                    stars_enabled: true,
+                    clock_enabled: true,
+                  }
+                }
+              });
 
               if (insertError) throw insertError;
               // console.log(
               //   "✅ Default settings created successfully:",
               //   defaultData
               // );
-              userSettings = defaultData;
+              userSettings = defaultData.data;
             } else {
               throw fetchError;
             }
           } else {
             // console.log("✅ Settings loaded successfully:", data);
-            userSettings = data;
+            userSettings = data.data;
           }
 
           setSettings(userSettings);
@@ -397,12 +386,8 @@ export function useUserSettings() {
             throw new Error("Supabase not available");
           }
 
-          // console.log("📡 Fetching settings from database for user:", user.id);
-          const { data, error: fetchError } = await supabase
-            .from("user_settings")
-            .select("*")
-            .eq("user_id", user.id)
-            .single();
+          // console.log("📡 Fetching settings via Edge Function for user:", user.id);
+          const { data, error: fetchError } = await supabase.functions.invoke('getUserSettings');
 
           let userSettings;
           if (fetchError) {
@@ -410,31 +395,30 @@ export function useUserSettings() {
             if (fetchError.code === "PGRST116") {
               // console.log("📝 No settings found, creating defaults");
 
-              // Create defaults inline
+              // Create defaults via Edge Function
               // console.log("📝 Creating default settings for user:", user.id);
-              const { data: defaultData, error: insertError } = await supabase
-                .from("user_settings")
-                .insert({
-                  user_id: user.id,
-                  theme_mode: "slate" as ThemeMode,
-                  stars_enabled: true,
-                  clock_enabled: true,
-                })
-                .select()
-                .single();
+              const { data: defaultData, error: insertError } = await supabase.functions.invoke('updateUserSettings', {
+                body: { 
+                  settings: {
+                    theme_mode: "slate" as ThemeMode,
+                    stars_enabled: true,
+                    clock_enabled: true,
+                  }
+                }
+              });
 
               if (insertError) throw insertError;
               // console.log(
               //   "✅ Default settings created successfully:",
               //   defaultData
               // );
-              userSettings = defaultData;
+              userSettings = defaultData.data;
             } else {
               throw fetchError;
             }
           } else {
             // console.log("✅ Settings loaded successfully:", data);
-            userSettings = data;
+            userSettings = data.data;
           }
 
           setSettings(userSettings);

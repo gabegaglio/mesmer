@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useUserSettings } from "./useUserSettings";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -35,7 +35,7 @@ export function useNightMode() {
   const weatherEnabled =
     user && settings ? settings.weather_enabled : localWeatherEnabled;
 
-  const cycleTheme = () => {
+  const cycleTheme = useCallback(() => {
     const getNextTheme = (current: ThemeMode): ThemeMode => {
       switch (current) {
         case "slate":
@@ -66,10 +66,10 @@ export function useNightMode() {
       // Update local state if user is not logged in
       setLocalThemeMode(nextTheme);
     }
-  };
+  }, [themeMode, user, settings, updateTheme]);
 
   // Direct theme setter function
-  const setTheme = (theme: ThemeMode) => {
+  const setTheme = useCallback((theme: ThemeMode) => {
     console.log("🎨 Setting theme directly:", {
       theme,
       current: themeMode,
@@ -82,31 +82,31 @@ export function useNightMode() {
     } else {
       setLocalThemeMode(theme);
     }
-  };
+  }, [themeMode, user, settings, updateTheme]);
 
-  const toggleNightEffects = (enabled: boolean) => {
+  const toggleNightEffects = useCallback((enabled: boolean) => {
     if (user && settings) {
       updateStarsEnabled(enabled);
     } else {
       setLocalNightEffectsEnabled(enabled);
     }
-  };
+  }, [user, settings, updateStarsEnabled]);
 
-  const toggleClock = (enabled: boolean) => {
+  const toggleClock = useCallback((enabled: boolean) => {
     if (user && settings) {
       updateClockEnabled(enabled);
     } else {
       setLocalClockEnabled(enabled);
     }
-  };
+  }, [user, settings, updateClockEnabled]);
 
-  const toggleWeather = (enabled: boolean) => {
+  const toggleWeather = useCallback((enabled: boolean) => {
     if (user && settings) {
       updateWeatherEnabled(enabled);
     } else {
       setLocalWeatherEnabled(enabled);
     }
-  };
+  }, [user, settings, updateWeatherEnabled]);
 
   // Backward compatibility
   const isNightMode = themeMode === "night";
@@ -129,7 +129,8 @@ export function useNightMode() {
     generateStars();
   }, []);
 
-  return {
+  // Memoize the return object to prevent unnecessary re-renders
+  return useMemo(() => ({
     themeMode,
     isNightMode,
     nightEffectsEnabled,
@@ -143,5 +144,19 @@ export function useNightMode() {
     toggleClock,
     toggleWeather,
     settingsLoading,
-  };
+  }), [
+    themeMode,
+    isNightMode,
+    nightEffectsEnabled,
+    clockEnabled,
+    weatherEnabled,
+    stars,
+    cycleTheme,
+    setTheme,
+    toggleDayNight,
+    toggleNightEffects,
+    toggleClock,
+    toggleWeather,
+    settingsLoading,
+  ]);
 }

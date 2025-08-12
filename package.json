@@ -19,6 +19,7 @@
     "@types/react-router-dom": "^5.3.3",
     "framer-motion": "^12.16.0",
     "howler": "^2.2.4",
+    "lucide-react": "^0.539.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.2",

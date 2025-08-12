@@ -111,19 +111,14 @@ export class SoundService {
    */
   static async getUserSounds(userId: string): Promise<CustomSoundRecord[]> {
     try {
-      const { data, error } = await supabase
-        .from("sounds")
-        .select("*")
-        .eq("user_id", userId)
-        .eq("is_active", true)
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.functions.invoke('getUserSounds');
 
       if (error) {
         console.error("Error fetching user sounds:", error);
         throw new Error(`Failed to fetch sounds: ${error.message}`);
       }
 
-      return data || [];
+      return data.data || [];
     } catch (error) {
       console.error("Error in getUserSounds:", error);
       throw error;

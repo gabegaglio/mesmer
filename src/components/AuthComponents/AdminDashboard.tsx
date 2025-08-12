@@ -25,32 +25,13 @@ const AdminDashboard = () => {
     try {
       setLoading(true);
 
-      // First try to fetch from our custom users table
-      const { data: usersData, error: usersError } = await supabase
-        .from("users")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.functions.invoke('getAllUsers');
 
-      if (usersError && usersError.code !== "PGRST116") {
-        // PGRST116 means table doesn't exist
-        throw usersError;
+      if (error) {
+        throw error;
       }
 
-      // If custom users table exists, use it; otherwise fetch from auth.users (admin only)
-      if (usersData && usersData.length > 0) {
-        setUsers(usersData);
-      } else {
-        // Fallback: This would need admin privileges or a custom function
-        setUsers([
-          {
-            id: user?.id || "",
-            email: user?.email || "",
-            role: user?.user_metadata?.role || "user",
-            created_at: user?.created_at || new Date().toISOString(),
-            last_sign_in_at: user?.last_sign_in_at,
-          },
-        ]);
-      }
+      setUsers(data.data || []);
     } catch (err: any) {
       setError(err.message);
       console.error("Error fetching users:", err);
@@ -61,10 +42,9 @@ const AdminDashboard = () => {
 
   const updateUserRole = async (userId: string, newRole: string) => {
     try {
-      const { error } = await supabase
-        .from("users")
-        .update({ role: newRole })
-        .eq("id", userId);
+      const { data, error } = await supabase.functions.invoke('updateUserRole', {
+        body: { userId, newRole }
+      });
 
       if (error) throw error;
 

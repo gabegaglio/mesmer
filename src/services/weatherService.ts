@@ -65,15 +65,8 @@ export class WeatherService {
         stack: error instanceof Error ? error.stack : undefined,
       });
 
-      // Return fallback data
-      return {
-        temperature: 72,
-        location: "San Francisco, CA",
-        conditions: "Sunny",
-        icon: "https://api.weather.gov/icons/land/day/skc",
-        high: 78,
-        low: 65,
-      };
+      // Re-throw the error instead of returning fallback data
+      throw error;
     }
   }
 
@@ -82,21 +75,23 @@ export class WeatherService {
     const condition = conditions.toLowerCase();
 
     if (condition.includes("sunny") || condition.includes("clear")) {
-      return "☀️";
-    } else if (condition.includes("partly cloudy")) {
-      return "⛅";
-    } else if (condition.includes("cloudy")) {
-      return "☁️";
-    } else if (condition.includes("rain")) {
-      return "🌧️";
-    } else if (condition.includes("snow")) {
-      return "❄️";
-    } else if (condition.includes("thunder")) {
-      return "⛈️";
-    } else if (condition.includes("fog") || condition.includes("mist")) {
-      return "🌫️";
+      return "Sun";
+    } else if (condition.includes("partly cloudy") || condition.includes("partly")) {
+      return "CloudSun";
+    } else if (condition.includes("cloudy") || condition.includes("overcast")) {
+      return "Cloud";
+    } else if (condition.includes("rain") || condition.includes("drizzle") || condition.includes("shower")) {
+      return "CloudRain";
+    } else if (condition.includes("snow") || condition.includes("sleet")) {
+      return "Snowflake";
+    } else if (condition.includes("thunder") || condition.includes("storm")) {
+      return "Zap";
+    } else if (condition.includes("fog") || condition.includes("mist") || condition.includes("haze")) {
+      return "CloudFog";
+    } else if (condition.includes("windy")) {
+      return "Wind";
     } else {
-      return "🌤️"; // Default
+      return "CloudSun"; // Default
     }
   }
 }

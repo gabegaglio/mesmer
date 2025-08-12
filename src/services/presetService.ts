@@ -44,85 +44,36 @@ export interface SoundPresetRecord {
 
 export class PresetService {
   /**
-   * Save a new sound preset with volume levels
+   * Save a new preset for a user
    */
   static async savePreset(
     userId: string,
     preset: CreatePresetInput
   ): Promise<SoundPresetRecord> {
     try {
-      console.log("🔍 PresetService Debug - Saving preset for user:", userId);
+      console.log("🔍 PresetService Debug - Saving preset via Edge Function for user:", userId);
       console.log("🔍 PresetService Debug - Preset input:", preset);
 
-      // Create the preset record
-      const { data: presetRecord, error: presetError } = await supabase
-        .from("sound_presets")
-        .insert({
-          user_id: userId,
-          name: preset.name,
-          description: preset.description,
-          is_favorite: false,
-        })
-        .select()
-        .single();
+      // Create the preset via Edge Function
+      const { data, error } = await supabase.functions.invoke('createPreset', {
+        body: { preset }
+      });
 
-      if (presetError) {
+      if (error) {
         console.error(
-          "❌ PresetService Debug - Error creating preset:",
-          presetError
+          "❌ PresetService Debug - Error creating preset via Edge Function:",
+          error
         );
-        throw new Error(`Failed to create preset: ${presetError.message}`);
+        throw new Error(`Failed to create preset: ${error.message}`);
       }
 
       console.log(
-        "✅ PresetService Debug - Created preset record:",
-        presetRecord
+        "✅ PresetService Debug - Created preset via Edge Function:",
+        data
       );
 
-      // Create preset_sounds records
-      if (preset.sounds.length > 0) {
-        const presetSounds = preset.sounds.map((sound, index) => ({
-          preset_id: presetRecord.id,
-          sound_id: sound.soundId || null,
-          sound_key: sound.soundKey || null,
-          volume: Math.max(0, Math.min(1, sound.volume)), // Clamp to 0-1
-          is_muted: sound.isMuted || false,
-          sort_order: sound.sortOrder ?? index,
-        }));
-
-        console.log(
-          "🔍 PresetService Debug - Preset sounds to insert:",
-          presetSounds
-        );
-
-        const { error: soundsError } = await supabase
-          .from("preset_sounds")
-          .insert(presetSounds);
-
-        if (soundsError) {
-          console.error(
-            "❌ PresetService Debug - Error creating preset sounds:",
-            soundsError
-          );
-
-          // Clean up the preset if sounds insertion fails
-          await supabase
-            .from("sound_presets")
-            .delete()
-            .eq("id", presetRecord.id);
-
-          throw new Error(
-            `Failed to save preset sounds: ${soundsError.message}`
-          );
-        }
-
-        console.log(
-          "✅ PresetService Debug - Successfully inserted preset sounds"
-        );
-      }
-
       // Return the complete preset with sounds
-      const result = await this.getPresetById(presetRecord.id, userId);
+      const result = await this.getPresetById(data.data.id, userId);
       console.log("✅ PresetService Debug - Final preset result:", result);
       return result;
     } catch (error) {
@@ -136,35 +87,14 @@ export class PresetService {
    */
   static async getUserPresets(userId: string): Promise<SoundPresetRecord[]> {
     try {
-      const { data, error } = await supabase
-        .from("sound_presets")
-        .select(
-          `
-          *,
-          preset_sounds (
-            preset_id,
-            sound_id,
-            sound_key,
-            volume,
-            is_muted,
-            sort_order,
-            sounds (
-              id,
-              name,
-              file_path,
-              category
-            )
-          )
-        `
-        )
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.functions.invoke('getUserPresets');
 
       if (error) {
+        console.error("Error fetching user presets:", error);
         throw new Error(`Failed to fetch presets: ${error.message}`);
       }
 
-      return data || [];
+      return data.data || [];
     } catch (error) {
       console.error("Error in getUserPresets:", error);
       throw error;
@@ -172,43 +102,22 @@ export class PresetService {
   }
 
   /**
-   * Get a specific preset by ID
+   * Get a specific preset by ID with all its sounds
    */
   static async getPresetById(
     presetId: string,
     userId: string
   ): Promise<SoundPresetRecord> {
     try {
-      const { data, error } = await supabase
-        .from("sound_presets")
-        .select(
-          `
-          *,
-          preset_sounds (
-            preset_id,
-            sound_id,
-            sound_key,
-            volume,
-            is_muted,
-            sort_order,
-            sounds (
-              id,
-              name,
-              file_path,
-              category
-            )
-          )
-        `
-        )
-        .eq("id", presetId)
-        .eq("user_id", userId)
-        .single();
+      const { data, error } = await supabase.functions.invoke('getPresetSounds', {
+        body: { presetId }
+      });
 
       if (error) {
         throw new Error(`Failed to fetch preset: ${error.message}`);
       }
 
-      return data;
+      return data.data;
     } catch (error) {
       console.error("Error in getPresetById:", error);
       throw error;
@@ -226,18 +135,9 @@ export class PresetService {
     >
   ): Promise<SoundPresetRecord> {
     try {
-      const { error } = await supabase
-        .from("sound_presets")
-        .update({
-          name: updates.name,
-          description: updates.description,
-          is_favorite: updates.isFavorite,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", presetId)
-        .eq("user_id", userId)
-        .select()
-        .single();
+      const { data, error } = await supabase.functions.invoke('updatePreset', {
+        body: { presetId, updates }
+      });
 
       if (error) {
         throw new Error(`Failed to update preset: ${error.message}`);
@@ -255,11 +155,9 @@ export class PresetService {
    */
   static async deletePreset(presetId: string, userId: string): Promise<void> {
     try {
-      const { error } = await supabase
-        .from("sound_presets")
-        .delete()
-        .eq("id", presetId)
-        .eq("user_id", userId);
+      const { error } = await supabase.functions.invoke('deletePreset', {
+        body: { presetId }
+      });
 
       if (error) {
         throw new Error(`Failed to delete preset: ${error.message}`);
@@ -279,53 +177,13 @@ export class PresetService {
     sounds: PresetSoundInput[]
   ): Promise<SoundPresetRecord> {
     try {
-      // Verify preset ownership
-      const { error: verifyError } = await supabase
-        .from("sound_presets")
-        .select("id")
-        .eq("id", presetId)
-        .eq("user_id", userId)
-        .single();
+      const { data, error } = await supabase.functions.invoke('updatePresetSounds', {
+        body: { presetId, sounds }
+      });
 
-      if (verifyError) {
-        throw new Error(`Preset not found: ${verifyError.message}`);
+      if (error) {
+        throw new Error(`Failed to update preset sounds: ${error.message}`);
       }
-
-      // Delete existing preset sounds
-      const { error: deleteError } = await supabase
-        .from("preset_sounds")
-        .delete()
-        .eq("preset_id", presetId);
-
-      if (deleteError) {
-        throw new Error(`Failed to remove old sounds: ${deleteError.message}`);
-      }
-
-      // Insert new preset sounds
-      if (sounds.length > 0) {
-        const presetSounds = sounds.map((sound, index) => ({
-          preset_id: presetId,
-          sound_id: sound.soundId || null,
-          sound_key: sound.soundKey || null,
-          volume: Math.max(0, Math.min(1, sound.volume)),
-          is_muted: sound.isMuted || false,
-          sort_order: sound.sortOrder ?? index,
-        }));
-
-        const { error: insertError } = await supabase
-          .from("preset_sounds")
-          .insert(presetSounds);
-
-        if (insertError) {
-          throw new Error(`Failed to save new sounds: ${insertError.message}`);
-        }
-      }
-
-      // Update preset timestamp
-      await supabase
-        .from("sound_presets")
-        .update({ updated_at: new Date().toISOString() })
-        .eq("id", presetId);
 
       return await this.getPresetById(presetId, userId);
     } catch (error) {
@@ -342,30 +200,12 @@ export class PresetService {
     userId: string
   ): Promise<SoundPresetRecord> {
     try {
-      // Get current favorite status
-      const { data: current, error: fetchError } = await supabase
-        .from("sound_presets")
-        .select("is_favorite")
-        .eq("id", presetId)
-        .eq("user_id", userId)
-        .single();
+      const { data, error } = await supabase.functions.invoke('togglePresetFavorite', {
+        body: { presetId }
+      });
 
-      if (fetchError) {
-        throw new Error(`Failed to fetch preset: ${fetchError.message}`);
-      }
-
-      // Toggle the favorite status
-      const { error: updateError } = await supabase
-        .from("sound_presets")
-        .update({
-          is_favorite: !current.is_favorite,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", presetId)
-        .eq("user_id", userId);
-
-      if (updateError) {
-        throw new Error(`Failed to update favorite: ${updateError.message}`);
+      if (error) {
+        throw new Error(`Failed to toggle favorite: ${error.message}`);
       }
 
       return await this.getPresetById(presetId, userId);

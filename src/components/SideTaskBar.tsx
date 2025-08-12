@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { type ThemeMode } from "../hooks/useTheme";
@@ -51,19 +51,15 @@ export function SideTaskBar({
   // Always show on mobile, show/hide based on activity on medium+
   const shouldShow = !isMediumScreen || isVisible;
 
-  // Fetch user role from public.users table
+  // Fetch user role from Edge Function
   useEffect(() => {
     const fetchUserRole = async () => {
       if (user && supabase) {
         try {
-          const { data, error } = await supabase
-            .from("users")
-            .select("role")
-            .eq("id", user.id)
-            .single();
+          const { data, error } = await supabase.functions.invoke('getUserRole');
 
           if (data && !error) {
-            setUserRole(data.role);
+            setUserRole(data.data.role);
           }
         } catch (error) {
           console.error("Error fetching user role:", error);
@@ -73,6 +69,11 @@ export function SideTaskBar({
 
     fetchUserRole();
   }, [user]);
+
+  // Memoize the toggle function to prevent unnecessary re-renders
+  const handleToggle = useCallback(() => {
+    setIsOpen(prev => !prev);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -126,7 +127,7 @@ export function SideTaskBar({
         >
           {/* Floating Settings Button */}
           <motion.button
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={handleToggle}
             className={`relative w-10 h-10 rounded-r-xl backdrop-blur-sm border-r border-t border-b transition-all duration-200 flex items-center justify-center cursor-pointer ${
               themeMode === "slate"
                 ? "bg-white/15 border-white/25 text-gray-700 hover:bg-white/25"
@@ -327,62 +328,52 @@ export function SideTaskBar({
                       </motion.button>
                     </div>
 
-                    {/* Weather */}
-                    <div
-                      className={`flex items-center justify-between p-3 rounded-xl ${
-                        weatherAvailable
-                          ? "cursor-pointer"
-                          : "cursor-not-allowed opacity-50"
-                      } ${
-                        themeMode === "slate"
-                          ? "bg-white/5 text-white"
-                          : themeMode === "day"
-                          ? "bg-white/10 text-white"
-                          : "bg-white/5 text-white"
-                      }`}
-                      title={
-                        !weatherAvailable
-                          ? "Weather data unavailable for your location"
-                          : ""
-                      }
-                    >
-                      <div className="flex items-center gap-3">
-                        <svg
-                          className="w-4 h-4 opacity-70"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,6.65C6.9,7.16 6.36,7.78 5.94,8.5C5.5,9.24 5.25,10 5.11,10.79L3.34,7M3.36,17L5.12,13.23C5.26,14 5.53,14.78 5.95,15.5C6.37,16.24 6.91,16.86 7.5,17.37L3.36,17M20.65,7L18.88,10.79C18.74,10 18.47,9.23 18.05,8.5C17.63,7.78 17.1,7.15 16.5,6.64L20.65,7M20.64,17L16.5,17.36C17.09,16.85 17.62,16.22 18.04,15.5C18.46,14.77 18.73,14 18.87,13.21L20.64,17M12,22L9.59,18.56C10.33,18.83 11.14,19 12,19C12.82,19 13.63,18.83 14.37,18.56L12,22Z" />
-                        </svg>
-                        <span className="text-sm">Weather</span>
-                        {!weatherAvailable && (
-                          <span className="text-xs opacity-60">
-                            (Unavailable)
-                          </span>
-                        )}
-                      </div>
-                      <motion.button
-                        onClick={() =>
-                          weatherAvailable && onToggleWeather(!weatherEnabled)
-                        }
-                        className={`w-10 h-5 rounded-full transition-all duration-300 ${
-                          weatherAvailable
-                            ? "cursor-pointer"
-                            : "cursor-not-allowed"
-                        } ${weatherEnabled ? "bg-blue-500" : "bg-white/20"}`}
-                        whileTap={{ scale: weatherAvailable ? 0.95 : 1 }}
-                      >
-                        <motion.div
-                          className="w-4 h-4 bg-white rounded-full shadow-sm mt-0.5"
-                          animate={{ x: weatherEnabled ? 24 : 2 }}
-                          transition={{
-                            type: "spring",
-                            stiffness: 500,
-                            damping: 30,
-                          }}
-                        />
-                      </motion.button>
-                    </div>
+                                         {/* Weather */}
+                     <div
+                       className={`flex items-center justify-between p-3 rounded-xl ${
+                         themeMode === "slate"
+                           ? "bg-white/5 text-white"
+                           : themeMode === "day"
+                           ? "bg-white/10 text-white"
+                           : "bg-white/5 text-white"
+                       }`}
+                     >
+                       <div className="flex items-center gap-3">
+                         <svg
+                           className="w-4 h-4 opacity-70"
+                           fill="currentColor"
+                           viewBox="0 0 24 24"
+                         >
+                           <path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,6.65C6.9,7.16 6.36,7.78 5.94,8.5C5.5,9.24 5.25,10 5.11,10.79L3.34,7M3.36,17L5.12,13.23C5.26,14 5.53,14.78 5.95,15.5C6.37,16.24 6.91,16.86 7.5,17.37L3.36,17M20.65,7L18.88,10.79C18.74,10 18.47,9.23 18.05,8.5C17.63,7.78 17.1,7.15 16.5,6.64L20.65,7M20.64,17L16.5,17.36C17.09,16.85 17.62,16.22 18.04,15.5C18.46,14.77 18.73,14 18.87,13.21L20.64,17M12,22L9.59,18.56C10.33,18.83 11.14,19 12,19C12.82,19 13.63,18.83 14.37,18.56L12,22Z" />
+                         </svg>
+                         <span className="text-sm">Weather</span>
+                         {!weatherAvailable && (
+                           <span className="text-xs opacity-60">
+                             (Unavailable)
+                           </span>
+                         )}
+                       </div>
+                       {/* Only show toggle when weather is available */}
+                       {weatherAvailable && (
+                         <motion.button
+                           onClick={() => onToggleWeather(!weatherEnabled)}
+                           className={`w-10 h-5 rounded-full transition-all duration-300 ${
+                             weatherEnabled ? "bg-blue-500" : "bg-white/20"
+                           }`}
+                           whileTap={{ scale: 0.95 }}
+                         >
+                           <motion.div
+                             className="w-4 h-4 bg-white rounded-full shadow-sm mt-0.5"
+                             animate={{ x: weatherEnabled ? 24 : 2 }}
+                             transition={{
+                               type: "spring",
+                               stiffness: 500,
+                               damping: 30,
+                             }}
+                           />
+                         </motion.button>
+                       )}
+                     </div>
 
                     {/* Divider */}
                     <div

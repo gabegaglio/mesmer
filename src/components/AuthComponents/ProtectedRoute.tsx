@@ -13,24 +13,20 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
   const [userRole, setUserRole] = useState<string>("user");
   const [roleLoading, setRoleLoading] = useState(true);
 
-  // Fetch user role from public.users table
+  // Fetch user role from Edge Function
   useEffect(() => {
     const fetchUserRole = async () => {
       if (user && supabase) {
         try {
           console.log("🔒 ProtectedRoute: Fetching role for user:", user.id);
 
-          const { data, error } = await supabase
-            .from("users")
-            .select("role")
-            .eq("id", user.id)
-            .single();
+          const { data, error } = await supabase.functions.invoke('getUserRole');
 
-          console.log("🔒 ProtectedRoute: Database response:", { data, error });
+          console.log("🔒 ProtectedRoute: Edge Function response:", { data, error });
 
           if (data && !error) {
-            console.log("🔒 ProtectedRoute: User role set to:", data.role);
-            setUserRole(data.role);
+            console.log("🔒 ProtectedRoute: User role set to:", data.data.role);
+            setUserRole(data.data.role);
           } else {
             console.log(
               "🔒 ProtectedRoute: Error or no data, defaulting to 'user'"

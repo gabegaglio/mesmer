@@ -1,6 +1,16 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useEffect } from "react";
 import { type ThemeMode } from "../hooks/useTheme";
-import { weatherService, type WeatherData } from "../services/weatherService";
+import { useWeatherCache } from "../hooks/useWeatherCache";
+import { 
+  Sun, 
+  CloudSun, 
+  Cloud, 
+  CloudRain, 
+  Snowflake, 
+  Zap, 
+  CloudFog,
+  Wind
+} from "lucide-react";
 
 interface WeatherProps {
   themeMode: ThemeMode;
@@ -8,30 +18,34 @@ interface WeatherProps {
   onWeatherAvailable?: (available: boolean) => void;
 }
 
-interface CachedLocation {
-  latitude: number;
-  longitude: number;
-  accuracy: number;
-  timestamp: number;
-}
-
-const LOCATION_CACHE_KEY = "mesmer_user_location";
-const LOCATION_CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
-const DEBOUNCE_DELAY = 1000; // 1 second
-const WEATHER_UPDATE_INTERVAL = 15 * 60 * 1000; // 15 minutes
-
 export function Weather({
   themeMode,
   className = "",
   onWeatherAvailable,
 }: WeatherProps) {
-  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showRetry, setShowRetry] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const isFetchingRef = useRef(false);
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const {
+    weatherData,
+    loading,
+    error,
+    showRetry,
+    isRefreshing,
+    fetchWeather,
+    refreshWeather,
+    clearLocationCache,
+  } = useWeatherCache();
+
+  // Notify parent about weather availability
+  useEffect(() => {
+    if (onWeatherAvailable) {
+      const isAvailable = !!(weatherData && !error && !loading);
+      onWeatherAvailable(isAvailable);
+    }
+  }, [weatherData, error, loading, onWeatherAvailable]);
+
+  // Don't render if no weather data
+  if (!weatherData) {
+    return null;
+  }
 
   const getWeatherStyles = (mode: ThemeMode) => {
     switch (mode) {
@@ -50,272 +64,56 @@ export function Weather({
 
   const styles = getWeatherStyles(themeMode);
 
-  // Secure location caching functions
-  const saveLocationToCache = useCallback(
-    (latitude: number, longitude: number, accuracy: number) => {
-      try {
-        const cachedLocation: CachedLocation = {
-          latitude,
-          longitude,
-          accuracy,
-          timestamp: Date.now(),
-        };
-        localStorage.setItem(
-          LOCATION_CACHE_KEY,
-          JSON.stringify(cachedLocation)
-        );
-        console.log("🌤️ Location cached securely");
-      } catch (error) {
-        console.warn("🌤️ Failed to cache location:", error);
-      }
-    },
-    []
-  );
+  // Function to get weather icon based on conditions
+  const getWeatherIcon = (conditions: string): string => {
+    const condition = conditions.toLowerCase();
 
-  const getLocationFromCache = useCallback((): CachedLocation | null => {
-    try {
-      const cached = localStorage.getItem(LOCATION_CACHE_KEY);
-      if (!cached) return null;
-
-      const location: CachedLocation = JSON.parse(cached);
-      const isExpired =
-        Date.now() - location.timestamp > LOCATION_CACHE_DURATION;
-
-      if (isExpired) {
-        localStorage.removeItem(LOCATION_CACHE_KEY);
-        console.log("🌤️ Cached location expired");
-        return null;
-      }
-
-      console.log("🌤️ Using cached location");
-      return location;
-    } catch (error) {
-      console.warn("🌤️ Failed to read cached location:", error);
-      localStorage.removeItem(LOCATION_CACHE_KEY);
-      return null;
+    if (condition.includes("sunny") || condition.includes("clear")) {
+      return "Sun";
+    } else if (condition.includes("partly cloudy") || condition.includes("partly")) {
+      return "CloudSun";
+    } else if (condition.includes("cloudy") || condition.includes("overcast")) {
+      return "Cloud";
+    } else if (condition.includes("rain") || condition.includes("drizzle") || condition.includes("shower")) {
+      return "CloudRain";
+    } else if (condition.includes("snow") || condition.includes("sleet")) {
+      return "Snowflake";
+    } else if (condition.includes("thunder") || condition.includes("storm")) {
+      return "Zap";
+    } else if (condition.includes("fog") || condition.includes("mist") || condition.includes("haze")) {
+      return "CloudFog";
+    } else if (condition.includes("windy")) {
+      return "Wind";
+    } else {
+      return "CloudSun"; // Default
     }
-  }, []);
+  };
 
-  const clearLocationCache = useCallback(() => {
-    try {
-      localStorage.removeItem(LOCATION_CACHE_KEY);
-      console.log("🌤️ Location cache cleared");
-    } catch (error) {
-      console.warn("🌤️ Failed to clear location cache:", error);
+  const weatherIcon = weatherData?.conditions ? getWeatherIcon(weatherData.conditions) : "CloudSun";
+
+  // Function to render the appropriate Lucide icon
+  const renderWeatherIcon = (iconName: string) => {
+    switch (iconName) {
+      case "Sun":
+        return <Sun size={24} className="xs:w-6 xs:h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 drop-shadow-lg" />;
+      case "CloudSun":
+        return <CloudSun size={24} className="xs:w-6 xs:h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 drop-shadow-lg" />;
+      case "Cloud":
+        return <Cloud size={24} className="xs:w-6 xs:h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 drop-shadow-lg" />;
+      case "CloudRain":
+        return <CloudRain size={24} className="xs:w-6 xs:h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 drop-shadow-lg" />;
+      case "Snowflake":
+        return <Snowflake size={24} className="xs:w-6 xs:h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 drop-shadow-lg" />;
+      case "Zap":
+        return <Zap size={24} className="xs:w-6 xs:h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 drop-shadow-lg" />;
+      case "CloudFog":
+        return <CloudFog size={24} className="xs:w-6 xs:h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 drop-shadow-lg" />;
+      case "Wind":
+        return <Wind size={24} className="xs:w-6 xs:h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 drop-shadow-lg" />;
+      default:
+        return <CloudSun size={24} className="xs:w-6 xs:h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 drop-shadow-lg" />;
     }
-  }, []);
-
-  const fetchWeather = useCallback(
-    async (useFallbackLocation = false) => {
-      // Prevent multiple simultaneous calls
-      if (isFetchingRef.current) {
-        console.log("🌤️ Weather fetch already in progress, skipping");
-        return;
-      }
-
-      isFetchingRef.current = true;
-      setLoading(true);
-      setError(null);
-      setShowRetry(false);
-
-      console.log(
-        "🌤️ Starting weather fetch, useFallbackLocation:",
-        useFallbackLocation
-      );
-
-      try {
-        let latitude: number, longitude: number;
-
-        if (useFallbackLocation) {
-          latitude = 37.7749;
-          longitude = -122.4194;
-          console.log("🌤️ Using fallback location (San Francisco):", {
-            latitude,
-            longitude,
-          });
-        } else {
-          // Try to get location from cache first
-          const cachedLocation = getLocationFromCache();
-
-          if (cachedLocation) {
-            latitude = cachedLocation.latitude;
-            longitude = cachedLocation.longitude;
-            console.log("🌤️ Using cached location:", { latitude, longitude });
-          } else {
-            console.log("🌤️ Requesting user location...");
-
-            const position = await new Promise<GeolocationPosition>(
-              (resolve, reject) => {
-                const timeoutId = setTimeout(() => {
-                  reject(new Error("Geolocation timeout"));
-                }, 15000);
-
-                navigator.geolocation.getCurrentPosition(
-                  (pos) => {
-                    clearTimeout(timeoutId);
-                    console.log(
-                      "🌤️ Location obtained successfully:",
-                      pos.coords
-                    );
-                    resolve(pos);
-                  },
-                  (error) => {
-                    clearTimeout(timeoutId);
-                    console.log("🌤️ Location error:", error);
-                    reject(error);
-                  },
-                  {
-                    timeout: 10000,
-                    enableHighAccuracy: false,
-                    maximumAge: 5 * 60 * 1000,
-                  }
-                );
-              }
-            );
-
-            latitude = position.coords.latitude;
-            longitude = position.coords.longitude;
-
-            // Cache the new location
-            saveLocationToCache(latitude, longitude, position.coords.accuracy);
-            console.log("🌤️ Using fresh location:", { latitude, longitude });
-          }
-        }
-
-        console.log("🌤️ Calling weather service with coordinates:", {
-          latitude,
-          longitude,
-        });
-        const data = await weatherService.getWeatherData(latitude, longitude);
-        console.log("🌤️ Weather data received:", data);
-        setWeatherData(data);
-      } catch (err) {
-        console.error("Weather fetch error:", err);
-
-        if (err instanceof GeolocationPositionError) {
-          console.log("🌤️ Geolocation error code:", err.code);
-          switch (err.code) {
-            case 1:
-              setError("Location access denied");
-              clearLocationCache(); // Clear invalid cache
-              break;
-            case 2:
-              setError("Location unavailable");
-              clearLocationCache();
-              break;
-            case 3:
-              setError("Location request timed out");
-              clearLocationCache();
-              break;
-            default:
-              setError("Unable to get location");
-              clearLocationCache();
-          }
-        } else {
-          setError("Unable to get weather data");
-          console.log("🌤️ Non-geolocation error:", err);
-        }
-
-        setShowRetry(true);
-        setWeatherData({
-          temperature: 72,
-          location: "San Francisco, CA",
-          conditions: "Sunny",
-          icon: "https://api.weather.gov/icons/land/day/skc",
-        });
-      } finally {
-        setLoading(false);
-        isFetchingRef.current = false;
-      }
-    },
-    [getLocationFromCache, saveLocationToCache, clearLocationCache]
-  );
-
-  // Debounced weather fetch
-  const debouncedFetchWeather = useCallback(
-    (useFallbackLocation = false) => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
-
-      debounceRef.current = setTimeout(() => {
-        fetchWeather(useFallbackLocation);
-      }, DEBOUNCE_DELAY);
-    },
-    [fetchWeather]
-  );
-
-  // Refresh weather data using cached location
-  const refreshWeather = useCallback(async () => {
-    if (isFetchingRef.current) {
-      console.log("🌤️ Weather refresh already in progress, skipping");
-      return;
-    }
-
-    const cachedLocation = getLocationFromCache();
-    if (!cachedLocation) {
-      console.log("🌤️ No cached location available for refresh");
-      return;
-    }
-
-    console.log("🌤️ Refreshing weather data...");
-    isFetchingRef.current = true;
-    setIsRefreshing(true);
-    setError(null);
-
-    try {
-      const data = await weatherService.getWeatherData(
-        cachedLocation.latitude,
-        cachedLocation.longitude
-      );
-      console.log("🌤️ Weather data refreshed:", data);
-      setWeatherData(data);
-    } catch (err) {
-      console.error("Weather refresh error:", err);
-      setError("Weather update failed");
-    } finally {
-      setIsRefreshing(false);
-      isFetchingRef.current = false;
-    }
-  }, [getLocationFromCache]);
-
-  // Get user location and fetch weather
-  useEffect(() => {
-    debouncedFetchWeather();
-
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
-    };
-  }, [debouncedFetchWeather]);
-
-  // Set up automatic weather updates every 15 minutes
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      console.log("🌤️ Auto-refreshing weather data...");
-      refreshWeather();
-    }, WEATHER_UPDATE_INTERVAL);
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [refreshWeather]);
-
-  // Notify parent about weather availability
-  useEffect(() => {
-    if (onWeatherAvailable) {
-      const isAvailable = !!(weatherData && !error && !loading);
-      onWeatherAvailable(isAvailable);
-    }
-  }, [weatherData, error, loading, onWeatherAvailable]);
-
-  // Don't render if no weather data
-  if (!weatherData) {
-    return null;
-  }
-
-  const weatherIcon = weatherService.getWeatherIcon(weatherData.conditions);
+  };
 
   return (
     <>
@@ -337,9 +135,7 @@ export function Weather({
         <div className="flex items-center justify-center gap-4 text-center">
           {/* Weather Icon */}
           <div className="relative">
-            <span className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl">
-              {weatherIcon}
-            </span>
+            {renderWeatherIcon(weatherIcon)}
           </div>
 
           {/* Temperature */}
@@ -395,14 +191,14 @@ export function Weather({
             <button
               onClick={() => {
                 clearLocationCache(); // Clear cache before retry
-                debouncedFetchWeather();
+                fetchWeather();
               }}
               className="px-2 py-1 text-xs bg-white/10 hover:bg-white/20 rounded transition-colors"
             >
               Retry Location
             </button>
             <button
-              onClick={() => debouncedFetchWeather(true)}
+              onClick={() => fetchWeather(true)}
               className="px-2 py-1 text-xs bg-white/10 hover:bg-white/20 rounded transition-colors"
             >
               Use Default
@@ -415,3 +211,4 @@ export function Weather({
 }
 
 export default Weather;
+

@@ -14,6 +14,7 @@ export function useActivityDetection({
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastMouseX = useRef(0);
   const lastMouseY = useRef(0);
+  const lastActivityTime = useRef(0);
 
   // Check screen size
   useEffect(() => {
@@ -46,9 +47,16 @@ export function useActivityDetection({
       const mouseDeltaX = Math.abs(currentMouseX - lastMouseX.current);
       const mouseDeltaY = Math.abs(currentMouseY - lastMouseY.current);
 
-      // Show toolbar on mouse movement
-      if (mouseDeltaX > 2 || mouseDeltaY > 2) {
-        setIsVisible(true);
+      // Only show toolbar on significant mouse movement (increased threshold from 2 to 10 pixels)
+      if (mouseDeltaX > 10 || mouseDeltaY > 10) {
+        const now = Date.now();
+        
+        // Only update if enough time has passed since last activity (debounce rapid movements)
+        if (now - lastActivityTime.current > 500) {
+          setIsVisible(true);
+          lastActivityTime.current = now;
+        }
+
         lastMouseX.current = currentMouseX;
         lastMouseY.current = currentMouseY;
 
@@ -66,7 +74,13 @@ export function useActivityDetection({
 
     // Handle touch events for mobile
     const handleTouchStart = () => {
-      setIsVisible(true);
+      const now = Date.now();
+      
+      // Only update if enough time has passed since last activity
+      if (now - lastActivityTime.current > 500) {
+        setIsVisible(true);
+        lastActivityTime.current = now;
+      }
 
       // Clear existing timeout
       if (timeoutRef.current) {

@@ -31,6 +31,15 @@ export default function SoundSlider({
   onWeatherAvailable,
   stars,
 }: SoundSliderProps) {
+  // Debug logging
+  useEffect(() => {
+    console.log("🎵 SoundSlider mounted with weather state:", { weatherEnabled, weatherAvailable });
+  }, [weatherEnabled, weatherAvailable]);
+
+  useEffect(() => {
+    console.log("🎵 Weather state changed:", { weatherEnabled, weatherAvailable });
+  }, [weatherEnabled, weatherAvailable]);
+
   const { allSounds, setCurrentVolumes } = useSounds();
 
   // Audio state management
@@ -179,6 +188,11 @@ export default function SoundSlider({
           themeMode={themeMode}
           onWeatherAvailable={onWeatherAvailable}
         />
+      )}
+      {!weatherEnabled && (
+        <div className="hidden">
+          {/* Debug: Weather is disabled */}
+        </div>
       )}
 
       <div className={`w-fit h-fit mt-0 md:mt-12`}>
