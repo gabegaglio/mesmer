@@ -124,6 +124,20 @@ export function useAudioControls({
   const handleApplyPreset = (presetVolumes: Record<string, number>) => {
     console.log("🔍 Loading preset with volumes:", presetVolumes);
 
+    // CRITICAL: Stop all currently playing audio and reset volumes to 0 first
+    console.log("🛑 Stopping all audio and resetting volumes to 0");
+    stopAllHowls();
+    
+    // Reset all volumes to 0 immediately to stop any ongoing sounds
+    setVolumes({
+      slot1: 0,
+      slot2: 0,
+      slot3: 0,
+      slot4: 0,
+      slot5: 0,
+      slot6: 0,
+    });
+
     // Convert preset volumes (which use sound keys/IDs) back to slot-based volumes
     const newVolumes: Record<SlotKey, number> = {
       slot1: 0,

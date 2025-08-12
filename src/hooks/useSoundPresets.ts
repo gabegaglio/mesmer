@@ -301,8 +301,48 @@ export function useSoundPresets(): UseSoundPresetsReturn {
 
     try {
       const preset = await PresetService.getPresetById(presetId, user.id);
-      const volumes = convertDatabaseVolumeToUI(preset.preset_sounds || []);
+      console.log("🔍 Loading preset data:", preset);
+      
+      // The getPresetById function returns a SoundPresetRecord with preset_sounds
+      const presetSounds = preset.preset_sounds || [];
+      console.log("🔍 Preset sounds to restore:", presetSounds);
+      
+      // Convert database volumes to UI volumes
+      const volumes = convertDatabaseVolumeToUI(presetSounds);
+      console.log("🔍 Converted volumes:", volumes);
+      
+      // Restore sound selections based on the preset sounds
+      const newSoundSelections: SoundSelections = {};
+      
+      presetSounds.forEach((presetSound: any, index: number) => {
+        const slotKey = `slot${index + 1}` as keyof SoundSelections;
+        const soundIdentifier = presetSound.sound_key || presetSound.sound_id;
+        
+        if (soundIdentifier) {
+          // Find the sound in allSounds
+          const sound = allSounds.find(s => 
+            (s.isCustom && s.id === soundIdentifier) || 
+            (!s.isCustom && 'key' in s && (s as any).key === soundIdentifier)
+          );
+          
+          if (sound) {
+            newSoundSelections[slotKey] = sound.id;
+            console.log(`✅ Restored ${soundIdentifier} to ${slotKey}`);
+          } else {
+            console.warn(`⚠️ Could not find sound for identifier: ${soundIdentifier}`);
+          }
+        }
+      });
+      
+      console.log("🔍 New sound selections:", newSoundSelections);
+      
+      // Clear current volumes first to ensure clean slate
+      setCurrentVolumes({});
+      
+      // Update both volumes and sound selections
       setCurrentVolumes(volumes);
+      setCurrentSoundSelections(newSoundSelections);
+      
       return volumes;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load preset");
