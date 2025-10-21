@@ -1,6 +1,10 @@
 # Mesmer - Ambient Sound Mixer
 
-A beautiful, responsive web application for creating custom ambient sound environments. Built with React, TypeScript, and modern web technologies.
+6 Channel ambient sound mixer built with modern and clean UI in mind
+
+## 🚀 Live Demo
+
+**Visit the live application**: [https://gabegaglio.github.io/mesmer](https://gabegaglio.github.io/mesmer)
 
 ## 🌟 Features
 
@@ -25,10 +29,6 @@ A beautiful, responsive web application for creating custom ambient sound enviro
 - **Real-time settings sync** across devices
 - **Personalized preferences** with cloud storage
 - **Optimized loading** with proper auth flow
-
-## 🚀 Live Demo
-
-**Visit the live application**: [https://gabegaglio.github.io/mesmer](https://gabegaglio.github.io/mesmer)
 
 ## 🛠️ Technology Stack
 
