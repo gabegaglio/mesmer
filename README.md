@@ -91,26 +91,6 @@ npm run dev
 npm run build
 npm run preview
 ```
-
-## 🔐 Supabase Configuration
-
-### OAuth Settings (Required for Live Deployment)
-
-To enable Google OAuth on the live site, configure these URLs in your Supabase dashboard:
-
-1. **Go to**: Supabase Dashboard > Authentication > URL Configuration
-2. **Add Site URL**: `https://gabegaglio.github.io/mesmer/`
-3. **Add Redirect URLs**:
-   - `https://gabegaglio.github.io/mesmer/`
-   - `https://gabegaglio.github.io/mesmer/auth`
-   - `https://gabegaglio.github.io/mesmer/admin`
-
-### Google OAuth Provider
-
-1. **Go to**: Supabase Dashboard > Authentication > Providers
-2. **Enable Google provider**
-3. **Add Authorized redirect URI**: `https://udakjarznbquozurrbyx.supabase.co/auth/v1/callback`
-
 ## 📄 License
 
 This project is open source and available under the [MIT License](LICENSE).
